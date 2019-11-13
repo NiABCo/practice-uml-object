@@ -1,7 +1,11 @@
 import { User } from "./models/user";
 import { Client } from "./models/client";
 import { Administrateur } from "./models/administrateur";
-import { ClientFactory } from "./helpers/client-factory";
+
+import { UserFactory } from "./helpers/user-factory";
+import { AdminStrategy } from "./helpers/strategies/admin-strategy";
+import { ClientStrategy } from "./helpers/strategies/client-strategy";
+import { ClientRepository } from "./repositories/client-repository";
 
 /**
  * @name App
@@ -10,41 +14,46 @@ import { ClientFactory } from "./helpers/client-factory";
  */
 export class App {
     public constructor(){
-        const moi : User = new Client();
-        moi.setName('Nicolas')
-        .setMail('nico@voila.fr')
-        .setPhone('0605040302');
+      const factory : UserFactory = new UserFactory();
 
-        const toi : User = new Client();
-        toi.setName('Mathilde')
-        .setMail('mathilde@yahoooo.com')  //Le saut de ligne n'interrompt pas le chaînage de méthode
-        .setPhone('0102030105');
+      //Instancie un repository pour les clients
+      const repository : ClientRepository = new ClientRepository();
 
-        const factory : ClientFactory = new ClientFactory(); //Instance de ClientFactory
-        const lui : Client = factory.full('Superman','0102030405', 'krypton42@lexcorp.com');//Données de l'instance de ClientFactory
-        const machin : Client = factory.createNameClient('Spiderman');
+      
+      //Add a client to the repository
+      repository.add(<Client> factory.create(
+        'Bond',
+        '007,5',
+        'James.bond@co.ok'
+    ));
 
-        console.log(lui)
+      //Loop over repository
+      repository.getRepository().forEach((client :  Client, id : number) => {
+        console.log(
+          `Nom :  + ${client.getName() } [${client.getId()}]\n`
+        );
+      })
 
-        //Outupt names of the users
 
-        console.log('Moi : ' + moi.getName() + ' Toi : '  + toi.getName());
 
-        const admin : Administrateur = Administrateur.getInstanceOf()
+     //To create an admin
+      factory.setStrategy(new AdminStrategy());
+      repository.add(<Client>factory.create(
+          'Super Admin',
+          '13511',
+          'admin@moi.fr',
+          '10, Baker street'
+      ));
 
-        admin.setName('Batman')
-             .setPhone('0102030405')
-             .setMail('admin@truc.fr');
-        admin.setAddress('Gotham City');
-
-        console.log(admin.getName() + ' vit à : ' + admin.getAddress());
-
-        const autreAdmin : Administrateur = Administrateur.getInstanceOf();
-        console.log('Autre admin vit aussi à : ' + autreAdmin.getAddress())
-
-       }
-
+       //Yet another user, don't forget to switch strategy back
+       factory.setStrategy(new ClientStrategy());
+      const bonClient : Client = factory.create(
+          'Picsou',
+          '11541',
+         'dollar@donaldville.com'
+        );
+       
     }
-
+}
 // Load the app...
 const app : App = new App();

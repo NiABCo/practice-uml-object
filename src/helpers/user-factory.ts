@@ -1,5 +1,5 @@
 import { UserStrategyInterface } from "./interfaces/user-strategy-interface";
-import { ClientStrategy } from "./strategies/client-strategy";
+import { ClientStrategy } from "./../helpers/strategies/client-strategy";
 import { User } from "./..//models/user";
 
 /**
@@ -9,7 +9,7 @@ import { User } from "./..//models/user";
  * @package helpers
  */
 
- class UserFactory{
+ export class UserFactory{
      private strategy : UserStrategyInterface = new ClientStrategy();
 
      public setStrategy(strategy :  UserStrategyInterface) : void {
